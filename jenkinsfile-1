@@ -1,0 +1,30 @@
+pipeline{
+    agent any
+    stages{
+        stage('SCM checkout'){
+             steps{
+                git credentialsId: 'github',
+                url: 'https://github.com/gouse3856/my-app.git'
+            }
+           
+        }
+        stage('maven build'){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
+        stage('nexus uploader'){
+            steps{
+              nexusArtifactUploader artifacts: 
+              [[artifactId: 'myweb', classifier: '', file: 'target/myweb-0.0.16.war', type: 'war']],
+              credentialsId: 'nexus', 
+              groupId: 'in.javahome', 
+              nexusUrl: '52.66.149.185:8081', 
+              nexusVersion: 'nexus3', 
+              protocol: 'http', 
+              repository: 'gouseapp-release', 
+              version: '0.0.16'
+            }
+        }
+    }    
+}
